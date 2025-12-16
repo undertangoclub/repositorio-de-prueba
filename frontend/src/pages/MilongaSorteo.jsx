@@ -354,15 +354,34 @@ const MilongaSorteo = () => {
               </div>
             </div>
 
+            {!sorteoBaileDisponible && (
+              <div className="mb-4 p-4 bg-amber-100 border-2 border-amber-300 rounded-lg flex items-center gap-3">
+                <Lock className="w-5 h-5 text-amber-700" />
+                <div>
+                  <p className="text-sm font-semibold text-amber-900">{mensajeBaile}</p>
+                  <p className="text-xs text-amber-700">El sorteo se habilitará el 21 de diciembre a las 22:30</p>
+                </div>
+              </div>
+            )}
+
             <Button
               onClick={handleSortearBaile}
-              disabled={sorteoActivo}
-              className="w-full bg-gradient-to-r from-orange-600 to-rose-600 hover:from-orange-700 hover:to-rose-700 text-white font-bold py-6 text-lg transition-all duration-300 shadow-lg hover:shadow-xl"
+              disabled={sorteoActivo || !sorteoBaileDisponible}
+              className={`w-full font-bold py-6 text-lg transition-all duration-300 shadow-lg hover:shadow-xl ${
+                !sorteoBaileDisponible 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-gradient-to-r from-orange-600 to-rose-600 hover:from-orange-700 hover:to-rose-700 text-white'
+              }`}
             >
               {sorteoActivo ? (
                 <>
                   <Shuffle className="w-5 h-5 mr-2 animate-spin" />
                   Sorteando...
+                </>
+              ) : !sorteoBaileDisponible ? (
+                <>
+                  <Lock className="w-5 h-5 mr-2" />
+                  Sorteo Bloqueado
                 </>
               ) : (
                 <>
