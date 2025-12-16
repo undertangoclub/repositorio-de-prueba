@@ -101,3 +101,97 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Sistema de sorteos para milonga con control de horarios - Testing completo del backend"
+
+backend:
+  - task: "Bailarines API - Create bailarín"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ POST /api/bailarines working correctly. Creates bailarín with automatic number assignment (tested numbers 5,6). Validates empty names properly. Data persists in MongoDB."
+
+  - task: "Bailarines API - List and Delete"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ GET /api/bailarines returns active bailarines correctly. DELETE /api/bailarines/{id} marks bailarín as inactive (not in active list). All CRUD operations working."
+
+  - task: "Sorteo Baile API - Availability Control"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ GET /api/sorteo-baile/disponible correctly returns blocked status until 21/12/2025 22:30. POST /api/sorteo-baile properly rejects attempts with 403 status when blocked."
+
+  - task: "Sorteo Premios API - Availability Control"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ GET /api/sorteo-premios/disponible correctly blocked until 22/12/2025 00:00. GET /api/sorteo-premios returns 3 premios (Caja de 6 huevos, Cuadro, Libro). POST /api/sorteo-premios/{id} properly blocked with 403."
+
+  - task: "Configuration API - Horarios"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ GET /api/config/horarios returns correct schedule configuration with proper dates (2025-12-21T22:30:00 for baile, 2025-12-22T00:00:00 for premios)."
+
+  - task: "MongoDB Data Persistence"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ Data persistence verified. Bailarines are correctly stored in MongoDB and retrieved consistently. All database operations working properly."
+
+frontend:
+  # Frontend testing not performed as per system limitations
+
+metadata:
+  created_by: "testing_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus: []
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "testing"
+    message: "Comprehensive backend testing completed successfully. All 14 test cases passed (100% success rate). Backend APIs are fully functional: bailarines CRUD operations, sorteo availability controls with proper date blocking, premios management, configuration endpoints, and MongoDB persistence. All time-based restrictions working correctly - sorteo baile blocked until 21/12/2025 22:30, sorteo premios blocked until 22/12/2025 00:00. Ready for production use."
