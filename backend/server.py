@@ -213,7 +213,7 @@ async def obtener_estado_premios():
 async def realizar_sorteo_premio(premio_id: int):
     """Realizar sorteo de un premio específico"""
     # Verificar disponibilidad
-    if not sorteo_premios_disponible():
+    if not await sorteo_premios_disponible(db):
         raise HTTPException(
             status_code=403,
             detail="El sorteo de premios aún no está disponible. Se habilitará a la medianoche (00:00)"
