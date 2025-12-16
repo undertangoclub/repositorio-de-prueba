@@ -100,7 +100,7 @@ async def eliminar_bailarin(bailarin_id: str):
 @api_router.get("/sorteo-baile/disponible", response_model=DisponibilidadResponse)
 async def verificar_sorteo_baile_disponible():
     """Verificar si el sorteo de baile está disponible"""
-    disponible = sorteo_baile_disponible()
+    disponible = await sorteo_baile_disponible(db)
     
     if disponible:
         return DisponibilidadResponse(
