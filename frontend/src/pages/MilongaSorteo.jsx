@@ -24,6 +24,7 @@ const MilongaSorteo = () => {
   const [premios, setPremios] = useState([]);
   const [sorteoActivo, setSorteoActivo] = useState(false);
   const [premioSeleccionado, setPremioSeleccionado] = useState(null);
+  const [updateKey, setUpdateKey] = useState(0);
 
   useEffect(() => {
     cargarBailarines();
@@ -32,7 +33,7 @@ const MilongaSorteo = () => {
 
   const cargarPremios = () => {
     const premiosActuales = obtenerPremios();
-    setPremios(premiosActuales);
+    setPremios(JSON.parse(JSON.stringify(premiosActuales))); // Deep clone to force re-render
   };
 
   const cargarBailarines = () => {
