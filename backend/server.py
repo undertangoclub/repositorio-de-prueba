@@ -269,6 +269,40 @@ async def obtener_horarios():
         "hora_actual_servidor": obtener_hora_actual_argentina().isoformat()
     }
 
+# ==================== OVERRIDE SECRETO ====================
+
+@api_router.post("/config/override-unlock")
+async def forzar_desbloqueo():
+    """Forzar desbloqueo de sorteos (botón secreto)"""
+    # Guardar override en la colección de configuración
+    await db.config.update_one(
+        {"tipo": "override"},
+        {"$set": {
+            "tipo": "override",
+            "sorteos_desbloqueados": True,
+            "fecha_override": obtener_hora_actual_argentina()
+        }},
+        upsert=True
+    )
+    
+    logger.warning("⚠️ OVERRIDE ACTIVADO - Sorteos desbloqueados manualmente")
+    return {"mensaje": "Sorteos desbloqueados exitosamente", "override_activo": True}
+
+@api_router.get("/config/override-status")
+async def verificar_override():
+    """Verificar si el override está activo"""
+    override = await db.config.find_one({"tipo": "override"})
+    if override and override.get("sorteos_desbloqueados"):
+        return {"override_activo": True}
+    return {"override_activo": False}
+
+@api_router.delete("/config/override-unlock")
+async def desactivar_override():
+    """Desactivar override (restaurar comportamiento normal)"""
+    await db.config.delete_one({"tipo": "override"})
+    logger.info("Override desactivado - sorteos vuelven a horario normal")
+    return {"mensaje": "Override desactivado", "override_activo": False}
+
 # Include the router in the main app
 app.include_router(api_router)
 
