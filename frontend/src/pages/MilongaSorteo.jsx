@@ -21,13 +21,19 @@ const MilongaSorteo = () => {
   const [bailarines, setBailarines] = useState([]);
   const [cantidadBailarines, setCantidadBailarines] = useState(2);
   const [resultadoSorteo, setResultadoSorteo] = useState(null);
-  const [premios, setPremios] = useState(mockPremios);
+  const [premios, setPremios] = useState([]);
   const [sorteoActivo, setSorteoActivo] = useState(false);
   const [premioSeleccionado, setPremioSeleccionado] = useState(null);
 
   useEffect(() => {
     cargarBailarines();
+    cargarPremios();
   }, []);
+
+  const cargarPremios = () => {
+    const premiosActuales = obtenerPremios();
+    setPremios(premiosActuales);
+  };
 
   const cargarBailarines = () => {
     const bailarinesActivos = obtenerBailarines();
