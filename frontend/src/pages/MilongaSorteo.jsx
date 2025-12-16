@@ -64,9 +64,9 @@ const MilongaSorteo = () => {
   const handleFooterClick = () => {
     setClickCount(prev => prev + 1);
     
-    // Triple clic para activar el override secreto
+    // Triple clic para activar/desactivar el override secreto (toggle)
     if (clickCount + 1 === 3) {
-      activarOverrideSecreto();
+      toggleOverrideSecreto();
       setClickCount(0);
     }
     
@@ -74,21 +74,34 @@ const MilongaSorteo = () => {
     setTimeout(() => setClickCount(0), 2000);
   };
 
-  const activarOverrideSecreto = async () => {
+  const toggleOverrideSecreto = async () => {
     try {
-      await axios.post(`${API}/config/override-unlock`);
-      await verificarDisponibilidad();
-      
-      toast({
-        title: "🔓 Sorteos Desbloqueados",
-        description: "Modo administrador activado. Todos los sorteos están disponibles.",
-        duration: 5000
-      });
+      if (overrideActivo) {
+        // Desactivar override
+        await axios.delete(`${API}/config/override-unlock`);
+        await verificarDisponibilidad();
+        
+        toast({
+          title: "🔒 Sorteos Bloqueados",
+          description: "Volviendo al horario programado.",
+          duration: 5000
+        });
+      } else {
+        // Activar override
+        await axios.post(`${API}/config/override-unlock`);
+        await verificarDisponibilidad();
+        
+        toast({
+          title: "🔓 Sorteos Desbloqueados",
+          description: "Modo administrador activado. Todos los sorteos están disponibles.",
+          duration: 5000
+        });
+      }
     } catch (error) {
-      console.error('Error activando override:', error);
+      console.error('Error en toggle override:', error);
       toast({
         title: "Error",
-        description: "No se pudo activar el desbloqueo",
+        description: "No se pudo cambiar el estado del desbloqueo",
         variant: "destructive"
       });
     }
