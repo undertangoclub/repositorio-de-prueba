@@ -55,9 +55,32 @@ const MilongaSorteo = () => {
     }
   };
 
-  const cargarBailarines = () => {
-    const bailarinesActivos = obtenerBailarines();
-    setBailarines(bailarinesActivos);
+  const cargarBailarines = async () => {
+    try {
+      const response = await axios.get(`${API}/bailarines`);
+      setBailarines(response.data);
+    } catch (error) {
+      console.error('Error cargando bailarines:', error);
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar los bailarines",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const cargarPremios = async () => {
+    try {
+      const response = await axios.get(`${API}/sorteo-premios`);
+      setPremios(response.data);
+    } catch (error) {
+      console.error('Error cargando premios:', error);
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar los premios",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleAgregarBailarin = () => {
