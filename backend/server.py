@@ -71,9 +71,16 @@ async def obtener_bailarines():
     """Obtener todos los bailarines activos"""
     bailarines = await bailarines_collection.find(
         {"activo": True}
-    ).sort("numero", 1).to_list(1000)
+    ).sort("created_at", 1).to_list(1000)
     
-    return [Bailarin(**b) for b in bailarines]
+    # Asignar números dinámicamente basándose en el orden
+    bailarines_con_numero = []
+    for idx, b in enumerate(bailarines, start=1):
+        bailarin = Bailarin(**b)
+        bailarin.numero = idx  # Número dinámico basado en posición
+        bailarines_con_numero.append(bailarin)
+    
+    return bailarines_con_numero
 
 @api_router.delete("/bailarines/{bailarin_id}")
 async def eliminar_bailarin(bailarin_id: str):
