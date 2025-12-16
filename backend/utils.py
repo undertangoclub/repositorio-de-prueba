@@ -49,13 +49,23 @@ def obtener_hora_actual_argentina():
     """Obtiene la hora actual en zona horaria de Argentina"""
     return datetime.now(ARGENTINA_TZ).replace(tzinfo=None)
 
-def sorteo_baile_disponible():
+async def sorteo_baile_disponible(db):
     """Verifica si el sorteo de baile está disponible"""
+    # Verificar si hay override activo
+    override = await db.config.find_one({"tipo": "override"})
+    if override and override.get("sorteos_desbloqueados"):
+        return True
+    
     ahora = obtener_hora_actual_argentina()
     return ahora >= SORTEO_BAILE_INICIO
 
-def sorteo_premios_disponible():
+async def sorteo_premios_disponible(db):
     """Verifica si el sorteo de premios está disponible"""
+    # Verificar si hay override activo
+    override = await db.config.find_one({"tipo": "override"})
+    if override and override.get("sorteos_desbloqueados"):
+        return True
+    
     ahora = obtener_hora_actual_argentina()
     return ahora >= SORTEO_PREMIOS_INICIO
 
