@@ -83,7 +83,7 @@ const MilongaSorteo = () => {
     }
   };
 
-  const handleAgregarBailarin = () => {
+  const handleAgregarBailarin = async () => {
     if (!nombreInput.trim()) {
       toast({
         title: "Error",
@@ -93,14 +93,26 @@ const MilongaSorteo = () => {
       return;
     }
 
-    const nuevoBailarin = agregarBailarin(nombreInput.trim());
-    cargarBailarines();
-    setNombreInput('');
-    
-    toast({
-      title: "¡Bailarín registrado!",
-      description: `${nuevoBailarin.nombre} - Número ${nuevoBailarin.numero}`
-    });
+    try {
+      const response = await axios.post(`${API}/bailarines`, {
+        nombre: nombreInput.trim()
+      });
+      
+      await cargarBailarines();
+      setNombreInput('');
+      
+      toast({
+        title: "¡Bailarín registrado!",
+        description: `${response.data.nombre} - Número ${response.data.numero}`
+      });
+    } catch (error) {
+      console.error('Error agregando bailarín:', error);
+      toast({
+        title: "Error",
+        description: error.response?.data?.detail || "No se pudo registrar el bailarín",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleEliminarBailarin = (id) => {
