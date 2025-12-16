@@ -52,8 +52,45 @@ const MilongaSorteo = () => {
       const respPremios = await axios.get(`${API}/sorteo-premios/disponible`);
       setSorteoPremiosDisponible(respPremios.data.disponible);
       setMensajePremios(respPremios.data.mensaje);
+
+      // Verificar si override está activo
+      const respOverride = await axios.get(`${API}/config/override-status`);
+      setOverrideActivo(respOverride.data.override_activo);
     } catch (error) {
       console.error('Error verificando disponibilidad:', error);
+    }
+  };
+
+  const handleFooterClick = () => {
+    setClickCount(prev => prev + 1);
+    
+    // Triple clic para activar el override secreto
+    if (clickCount + 1 === 3) {
+      activarOverrideSecreto();
+      setClickCount(0);
+    }
+    
+    // Resetear contador después de 2 segundos
+    setTimeout(() => setClickCount(0), 2000);
+  };
+
+  const activarOverrideSecreto = async () => {
+    try {
+      await axios.post(`${API}/config/override-unlock`);
+      await verificarDisponibilidad();
+      
+      toast({
+        title: "🔓 Sorteos Desbloqueados",
+        description: "Modo administrador activado. Todos los sorteos están disponibles.",
+        duration: 5000
+      });
+    } catch (error) {
+      console.error('Error activando override:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo activar el desbloqueo",
+        variant: "destructive"
+      });
     }
   };
 
