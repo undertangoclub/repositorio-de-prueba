@@ -133,7 +133,7 @@ const MilongaSorteo = () => {
     }
   };
 
-  const handleSortearBaile = () => {
+  const handleSortearBaile = async () => {
     if (bailarines.length === 0) {
       toast({
         title: "Error",
@@ -143,24 +143,44 @@ const MilongaSorteo = () => {
       return;
     }
 
+    if (!sorteoBaileDisponible) {
+      toast({
+        title: "Sorteo no disponible",
+        description: mensajeBaile,
+        variant: "destructive"
+      });
+      return;
+    }
+
     setSorteoActivo(true);
     
     // Animación de sorteo
-    setTimeout(() => {
-      const bailarinesSorteados = sortearBailarines(cantidadBailarines);
-      const ritmoSorteado = sortearRitmo();
-      
-      setResultadoSorteo({
-        bailarines: bailarinesSorteados,
-        ritmo: ritmoSorteado
-      });
-      
-      setSorteoActivo(false);
-      
-      toast({
-        title: "¡A bailar!",
-        description: `${ritmoSorteado} - ${bailarinesSorteados.length} bailarín(es)`
-      });
+    setTimeout(async () => {
+      try {
+        const response = await axios.post(`${API}/sorteo-baile`, {
+          cantidad: cantidadBailarines
+        });
+        
+        setResultadoSorteo({
+          bailarines: response.data.bailarines,
+          ritmo: response.data.ritmo
+        });
+        
+        setSorteoActivo(false);
+        
+        toast({
+          title: "¡A bailar!",
+          description: `${response.data.ritmo} - ${response.data.bailarines.length} bailarín(es)`
+        });
+      } catch (error) {
+        setSorteoActivo(false);
+        console.error('Error en sorteo de baile:', error);
+        toast({
+          title: "Error",
+          description: error.response?.data?.detail || "No se pudo realizar el sorteo",
+          variant: "destructive"
+        });
+      }
     }, 2000);
   };
 
