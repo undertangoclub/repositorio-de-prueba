@@ -19,15 +19,40 @@ const MilongaSorteo = () => {
   const [sorteoActivo, setSorteoActivo] = useState(false);
   const [premioSeleccionado, setPremioSeleccionado] = useState(null);
   const [updateKey, setUpdateKey] = useState(0);
+  const [sorteoBaileDisponible, setSorteoBaileDisponible] = useState(false);
+  const [sorteoPremiosDisponible, setSorteoPremiosDisponible] = useState(false);
+  const [mensajeBaile, setMensajeBaile] = useState('');
+  const [mensajePremios, setMensajePremios] = useState('');
 
   useEffect(() => {
-    cargarBailarines();
-    cargarPremios();
+    cargarDatos();
+    // Verificar disponibilidad cada minuto
+    const interval = setInterval(() => {
+      verificarDisponibilidad();
+    }, 60000);
+    return () => clearInterval(interval);
   }, []);
 
-  const cargarPremios = () => {
-    const premiosActuales = obtenerPremios();
-    setPremios(JSON.parse(JSON.stringify(premiosActuales))); // Deep clone to force re-render
+  const cargarDatos = async () => {
+    await cargarBailarines();
+    await cargarPremios();
+    await verificarDisponibilidad();
+  };
+
+  const verificarDisponibilidad = async () => {
+    try {
+      // Verificar sorteo de baile
+      const respBaile = await axios.get(`${API}/sorteo-baile/disponible`);
+      setSorteoBaileDisponible(respBaile.data.disponible);
+      setMensajeBaile(respBaile.data.mensaje);
+
+      // Verificar sorteo de premios
+      const respPremios = await axios.get(`${API}/sorteo-premios/disponible`);
+      setSorteoPremiosDisponible(respPremios.data.disponible);
+      setMensajePremios(respPremios.data.mensaje);
+    } catch (error) {
+      console.error('Error verificando disponibilidad:', error);
+    }
   };
 
   const cargarBailarines = () => {
