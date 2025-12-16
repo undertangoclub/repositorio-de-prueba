@@ -6,8 +6,8 @@ import random
 ARGENTINA_TZ = pytz.timezone('America/Argentina/Buenos_Aires')
 
 # Fecha y hora de desbloqueo
-SORTEO_BAILE_INICIO = datetime(2024, 12, 21, 22, 30, 0)
-SORTEO_PREMIOS_INICIO = datetime(2024, 12, 22, 0, 0, 0)
+SORTEO_BAILE_INICIO = datetime(2025, 12, 21, 22, 30, 0)
+SORTEO_PREMIOS_INICIO = datetime(2025, 12, 22, 0, 0, 0)
 
 # Lista de ritmos
 RITMOS = [
