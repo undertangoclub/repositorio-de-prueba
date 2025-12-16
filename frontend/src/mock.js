@@ -28,13 +28,26 @@ export const mockRitmos = [
   'Cha Cha Cha'
 ];
 
-export const mockPremios = [
+export let mockPremios = [
   { id: 1, nombre: 'Caja de 6 huevos', ganado: false },
   { id: 2, nombre: 'Cuadro', ganado: false },
   { id: 3, nombre: 'Libro', ganado: false }
 ];
 
 export let mockBailarines = [];
+
+export const obtenerPremios = () => {
+  return mockPremios;
+};
+
+export const marcarPremioGanado = (premioId, ganador) => {
+  const premio = mockPremios.find(p => p.id === premioId);
+  if (premio) {
+    premio.ganado = true;
+    premio.ganador = ganador;
+  }
+  return mockPremios;
+};
 
 // Funciones para simular operaciones de backend
 export const agregarBailarin = (nombre) => {
