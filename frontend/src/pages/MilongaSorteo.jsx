@@ -115,13 +115,22 @@ const MilongaSorteo = () => {
     }
   };
 
-  const handleEliminarBailarin = (id) => {
-    eliminarBailarin(id);
-    cargarBailarines();
-    toast({
-      title: "Bailarín eliminado",
-      description: "Se ha eliminado el bailarín de la lista"
-    });
+  const handleEliminarBailarin = async (id) => {
+    try {
+      await axios.delete(`${API}/bailarines/${id}`);
+      await cargarBailarines();
+      toast({
+        title: "Bailarín eliminado",
+        description: "Se ha eliminado el bailarín de la lista"
+      });
+    } catch (error) {
+      console.error('Error eliminando bailarín:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar el bailarín",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSortearBaile = () => {
