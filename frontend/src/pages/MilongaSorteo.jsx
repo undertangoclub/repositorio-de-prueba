@@ -545,10 +545,17 @@ const MilongaSorteo = () => {
         </Card>
       </div>
 
-      {/* Footer */}
-      <div className="bg-gradient-to-r from-amber-900 via-orange-800 to-amber-900 text-white py-6 mt-12">
+      {/* Footer con botón secreto */}
+      <div 
+        className="bg-gradient-to-r from-amber-900 via-orange-800 to-amber-900 text-white py-6 mt-12 cursor-pointer select-none"
+        onClick={handleFooterClick}
+        title="Triple clic para desbloqueo de emergencia"
+      >
         <div className="max-w-6xl mx-auto text-center px-4">
-          <p className="text-amber-100">¡Nos vemos en la pista! 🎵</p>
+          <p className="text-amber-100">
+            ¡Nos vemos en la pista! 🎵
+            {overrideActivo && <span className="ml-3 text-xs opacity-50">🔓</span>}
+          </p>
         </div>
       </div>
     </div>
