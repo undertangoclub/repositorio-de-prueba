@@ -23,6 +23,8 @@ const MilongaSorteo = () => {
   const [sorteoPremiosDisponible, setSorteoPremiosDisponible] = useState(false);
   const [mensajeBaile, setMensajeBaile] = useState('');
   const [mensajePremios, setMensajePremios] = useState('');
+  const [clickCount, setClickCount] = useState(0);
+  const [overrideActivo, setOverrideActivo] = useState(false);
 
   useEffect(() => {
     cargarDatos();
