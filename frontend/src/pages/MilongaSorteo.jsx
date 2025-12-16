@@ -434,6 +434,16 @@ const MilongaSorteo = () => {
             <CardDescription>Sortea los premios entre los participantes</CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
+            {!sorteoPremiosDisponible && (
+              <div className="mb-6 p-4 bg-rose-100 border-2 border-rose-300 rounded-lg flex items-center gap-3">
+                <Clock className="w-5 h-5 text-rose-700" />
+                <div>
+                  <p className="text-sm font-semibold text-rose-900">{mensajePremios}</p>
+                  <p className="text-xs text-rose-700">El sorteo se habilitará a la medianoche (00:00)</p>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {premios.map((premio) => (
                 <div
