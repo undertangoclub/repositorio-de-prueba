@@ -1,15 +1,24 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
 from typing import List
-import uuid
-from datetime import datetime, timezone
 
+from models import (
+    BailarinCreate, Bailarin, 
+    SorteoBaileCreate, SorteoBaile, BailarinSorteado,
+    Premio, SorteoPremio, Ganador,
+    DisponibilidadResponse
+)
+from utils import (
+    sorteo_baile_disponible, sorteo_premios_disponible,
+    sortear_ritmo, sortear_bailarines, sortear_ganador,
+    SORTEO_BAILE_INICIO, SORTEO_PREMIOS_INICIO, PREMIOS,
+    obtener_hora_actual_argentina
+)
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -19,63 +28,16 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
+# Collections
+bailarines_collection = db.bailarines
+sorteos_baile_collection = db.sorteos_baile
+sorteos_premios_collection = db.sorteos_premios
+
 # Create the main app without a prefix
 app = FastAPI()
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
-
-
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-class StatusCheckCreate(BaseModel):
-    client_name: str
-
-# Add your routes to the router instead of directly to app
-@api_router.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
-    
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
-    
-    return status_checks
-
-# Include the router in the main app
-app.include_router(api_router)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # Configure logging
 logging.basicConfig(
@@ -83,6 +45,240 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# ==================== BAILARINES ENDPOINTS ====================
+
+@api_router.post("/bailarines", response_model=Bailarin)
+async def crear_bailarin(bailarin_input: BailarinCreate):
+    """Registrar un nuevo bailarín"""
+    if not bailarin_input.nombre.strip():
+        raise HTTPException(status_code=400, detail="El nombre no puede estar vacío")
+    
+    # Obtener el último número
+    ultimo_bailarin = await bailarines_collection.find_one(
+        sort=[("numero", -1)]
+    )
+    siguiente_numero = (ultimo_bailarin['numero'] + 1) if ultimo_bailarin else 1
+    
+    # Crear bailarín
+    bailarin = Bailarin(
+        nombre=bailarin_input.nombre.strip(),
+        numero=siguiente_numero
+    )
+    
+    # Guardar en DB
+    await bailarines_collection.insert_one(bailarin.dict())
+    
+    logger.info(f"Bailarín registrado: {bailarin.nombre} - Número {bailarin.numero}")
+    return bailarin
+
+@api_router.get("/bailarines", response_model=List[Bailarin])
+async def obtener_bailarines():
+    """Obtener todos los bailarines activos"""
+    bailarines = await bailarines_collection.find(
+        {"activo": True}
+    ).sort("numero", 1).to_list(1000)
+    
+    return [Bailarin(**b) for b in bailarines]
+
+@api_router.delete("/bailarines/{bailarin_id}")
+async def eliminar_bailarin(bailarin_id: str):
+    """Eliminar un bailarín (marcar como inactivo)"""
+    result = await bailarines_collection.update_one(
+        {"id": bailarin_id},
+        {"$set": {"activo": False}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Bailarín no encontrado")
+    
+    logger.info(f"Bailarín eliminado: {bailarin_id}")
+    return {"mensaje": "Bailarín eliminado exitosamente"}
+
+# ==================== SORTEO BAILE ENDPOINTS ====================
+
+@api_router.get("/sorteo-baile/disponible", response_model=DisponibilidadResponse)
+async def verificar_sorteo_baile_disponible():
+    """Verificar si el sorteo de baile está disponible"""
+    disponible = sorteo_baile_disponible()
+    
+    if disponible:
+        return DisponibilidadResponse(
+            disponible=True,
+            mensaje="El sorteo de baile está disponible"
+        )
+    else:
+        return DisponibilidadResponse(
+            disponible=False,
+            mensaje=f"El sorteo de baile se habilitará el 21 de diciembre a las 22:30",
+            fecha_desbloqueo=SORTEO_BAILE_INICIO
+        )
+
+@api_router.post("/sorteo-baile", response_model=SorteoBaile)
+async def realizar_sorteo_baile(sorteo_input: SorteoBaileCreate):
+    """Realizar sorteo de baile"""
+    # Verificar disponibilidad
+    if not sorteo_baile_disponible():
+        raise HTTPException(
+            status_code=403, 
+            detail="El sorteo de baile aún no está disponible. Se habilitará el 21 de diciembre a las 22:30"
+        )
+    
+    # Obtener bailarines activos
+    bailarines = await bailarines_collection.find(
+        {"activo": True}
+    ).to_list(1000)
+    
+    if not bailarines:
+        raise HTTPException(status_code=400, detail="No hay bailarines registrados")
+    
+    # Sortear bailarines y ritmo
+    bailarines_sorteados = sortear_bailarines(bailarines, sorteo_input.cantidad)
+    ritmo_sorteado = sortear_ritmo()
+    
+    # Crear objeto de sorteo
+    sorteo = SorteoBaile(
+        bailarines=[
+            BailarinSorteado(
+                id=b['id'],
+                nombre=b['nombre'],
+                numero=b['numero']
+            ) for b in bailarines_sorteados
+        ],
+        ritmo=ritmo_sorteado,
+        cantidad=sorteo_input.cantidad
+    )
+    
+    # Guardar en historial
+    await sorteos_baile_collection.insert_one(sorteo.dict())
+    
+    logger.info(f"Sorteo de baile realizado: {ritmo_sorteado} - {len(bailarines_sorteados)} bailarín(es)")
+    return sorteo
+
+@api_router.get("/sorteo-baile/historial", response_model=List[SorteoBaile])
+async def obtener_historial_sorteo_baile():
+    """Obtener historial de sorteos de baile"""
+    sorteos = await sorteos_baile_collection.find().sort("created_at", -1).to_list(100)
+    return [SorteoBaile(**s) for s in sorteos]
+
+# ==================== SORTEO PREMIOS ENDPOINTS ====================
+
+@api_router.get("/sorteo-premios/disponible", response_model=DisponibilidadResponse)
+async def verificar_sorteo_premios_disponible():
+    """Verificar si el sorteo de premios está disponible"""
+    disponible = sorteo_premios_disponible()
+    
+    if disponible:
+        return DisponibilidadResponse(
+            disponible=True,
+            mensaje="El sorteo de premios está disponible"
+        )
+    else:
+        return DisponibilidadResponse(
+            disponible=False,
+            mensaje=f"El sorteo de premios se habilitará a la medianoche (00:00)",
+            fecha_desbloqueo=SORTEO_PREMIOS_INICIO
+        )
+
+@api_router.get("/sorteo-premios", response_model=List[Premio])
+async def obtener_estado_premios():
+    """Obtener estado de todos los premios"""
+    # Obtener premios ya sorteados
+    premios_sorteados = await sorteos_premios_collection.find().to_list(100)
+    premios_sorteados_ids = {p['premio_id'] for p in premios_sorteados}
+    
+    # Crear lista de premios con estado
+    resultado = []
+    for premio_config in PREMIOS:
+        if premio_config['id'] in premios_sorteados_ids:
+            # Premio ya sorteado
+            sorteo = next(p for p in premios_sorteados if p['premio_id'] == premio_config['id'])
+            resultado.append(Premio(
+                id=premio_config['id'],
+                nombre=premio_config['nombre'],
+                ganado=True,
+                ganador=Ganador(**sorteo['ganador'])
+            ))
+        else:
+            # Premio disponible
+            resultado.append(Premio(
+                id=premio_config['id'],
+                nombre=premio_config['nombre'],
+                ganado=False
+            ))
+    
+    return resultado
+
+@api_router.post("/sorteo-premios/{premio_id}", response_model=SorteoPremio)
+async def realizar_sorteo_premio(premio_id: int):
+    """Realizar sorteo de un premio específico"""
+    # Verificar disponibilidad
+    if not sorteo_premios_disponible():
+        raise HTTPException(
+            status_code=403,
+            detail="El sorteo de premios aún no está disponible. Se habilitará a la medianoche (00:00)"
+        )
+    
+    # Verificar que el premio existe
+    premio_config = next((p for p in PREMIOS if p['id'] == premio_id), None)
+    if not premio_config:
+        raise HTTPException(status_code=404, detail="Premio no encontrado")
+    
+    # Verificar que el premio no haya sido sorteado
+    premio_existente = await sorteos_premios_collection.find_one({"premio_id": premio_id})
+    if premio_existente:
+        raise HTTPException(status_code=400, detail="Este premio ya ha sido sorteado")
+    
+    # Obtener bailarines activos
+    bailarines = await bailarines_collection.find(
+        {"activo": True}
+    ).to_list(1000)
+    
+    if not bailarines:
+        raise HTTPException(status_code=400, detail="No hay participantes para el sorteo")
+    
+    # Sortear ganador
+    ganador_data = sortear_ganador(bailarines)
+    ganador = Ganador(
+        id=ganador_data['id'],
+        nombre=ganador_data['nombre'],
+        numero=ganador_data['numero']
+    )
+    
+    # Crear objeto de sorteo
+    sorteo_premio = SorteoPremio(
+        premio_id=premio_id,
+        premio_nombre=premio_config['nombre'],
+        ganador=ganador
+    )
+    
+    # Guardar en DB
+    await sorteos_premios_collection.insert_one(sorteo_premio.dict())
+    
+    logger.info(f"Premio sorteado: {premio_config['nombre']} - Ganador: {ganador.nombre} (N° {ganador.numero})")
+    return sorteo_premio
+
+# ==================== CONFIGURACIÓN ENDPOINTS ====================
+
+@api_router.get("/config/horarios")
+async def obtener_horarios():
+    """Obtener configuración de horarios"""
+    return {
+        "sorteo_baile_inicio": SORTEO_BAILE_INICIO.isoformat(),
+        "sorteo_premios_inicio": SORTEO_PREMIOS_INICIO.isoformat(),
+        "hora_actual_servidor": obtener_hora_actual_argentina().isoformat()
+    }
+
+# Include the router in the main app
+app.include_router(api_router)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
