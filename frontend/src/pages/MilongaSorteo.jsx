@@ -125,11 +125,8 @@ const MilongaSorteo = () => {
     setTimeout(() => {
       const ganador = sortearPremio(premio.id);
       
-      setPremios(prevPremios =>
-        prevPremios.map(p =>
-          p.id === premio.id ? { ...p, ganado: true, ganador: ganador } : p
-        )
-      );
+      marcarPremioGanado(premio.id, ganador);
+      cargarPremios();
       
       setPremioSeleccionado(null);
       
