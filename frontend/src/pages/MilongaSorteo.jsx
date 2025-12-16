@@ -474,13 +474,22 @@ const MilongaSorteo = () => {
                   ) : (
                     <Button
                       onClick={() => handleSortearPremio(premio)}
-                      disabled={premioSeleccionado === premio.id}
-                      className="w-full bg-rose-600 hover:bg-rose-700 transition-all duration-300"
+                      disabled={premioSeleccionado === premio.id || !sorteoPremiosDisponible}
+                      className={`w-full transition-all duration-300 ${
+                        !sorteoPremiosDisponible
+                          ? 'bg-gray-400 cursor-not-allowed'
+                          : 'bg-rose-600 hover:bg-rose-700'
+                      }`}
                     >
                       {premioSeleccionado === premio.id ? (
                         <>
                           <Sparkles className="w-4 h-4 mr-2 animate-spin" />
                           Sorteando...
+                        </>
+                      ) : !sorteoPremiosDisponible ? (
+                        <>
+                          <Lock className="w-4 h-4 mr-2" />
+                          Bloqueado
                         </>
                       ) : (
                         <>
