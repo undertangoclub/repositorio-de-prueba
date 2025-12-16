@@ -54,22 +54,16 @@ async def crear_bailarin(bailarin_input: BailarinCreate):
     if not bailarin_input.nombre.strip():
         raise HTTPException(status_code=400, detail="El nombre no puede estar vacío")
     
-    # Obtener el último número
-    ultimo_bailarin = await bailarines_collection.find_one(
-        sort=[("numero", -1)]
-    )
-    siguiente_numero = (ultimo_bailarin['numero'] + 1) if ultimo_bailarin else 1
-    
-    # Crear bailarín
+    # Crear bailarín sin número (se calculará dinámicamente en frontend)
     bailarin = Bailarin(
         nombre=bailarin_input.nombre.strip(),
-        numero=siguiente_numero
+        numero=0  # Número temporal, se calculará en frontend
     )
     
     # Guardar en DB
     await bailarines_collection.insert_one(bailarin.dict())
     
-    logger.info(f"Bailarín registrado: {bailarin.nombre} - Número {bailarin.numero}")
+    logger.info(f"Bailarín registrado: {bailarin.nombre}")
     return bailarin
 
 @api_router.get("/bailarines", response_model=List[Bailarin])
