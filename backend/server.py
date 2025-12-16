@@ -166,7 +166,7 @@ async def obtener_historial_sorteo_baile():
 @api_router.get("/sorteo-premios/disponible", response_model=DisponibilidadResponse)
 async def verificar_sorteo_premios_disponible():
     """Verificar si el sorteo de premios está disponible"""
-    disponible = sorteo_premios_disponible()
+    disponible = await sorteo_premios_disponible(db)
     
     if disponible:
         return DisponibilidadResponse(
