@@ -184,7 +184,7 @@ const MilongaSorteo = () => {
     }, 2000);
   };
 
-  const handleSortearPremio = (premio) => {
+  const handleSortearPremio = async (premio) => {
     if (bailarines.length === 0) {
       toast({
         title: "Error",
@@ -203,22 +203,40 @@ const MilongaSorteo = () => {
       return;
     }
 
+    if (!sorteoPremiosDisponible) {
+      toast({
+        title: "Sorteo no disponible",
+        description: mensajePremios,
+        variant: "destructive"
+      });
+      return;
+    }
+
     setPremioSeleccionado(premio.id);
     
     // Animación de sorteo
-    setTimeout(() => {
-      const ganador = sortearPremio(premio.id);
-      
-      marcarPremioGanado(premio.id, ganador);
-      cargarPremios();
-      setUpdateKey(prev => prev + 1); // Force re-render
-      
-      setPremioSeleccionado(null);
-      
-      toast({
-        title: "¡Tenemos ganador!",
-        description: `${ganador.nombre} (N° ${ganador.numero}) ganó: ${premio.nombre}`
-      });
+    setTimeout(async () => {
+      try {
+        const response = await axios.post(`${API}/sorteo-premios/${premio.id}`);
+        
+        await cargarPremios();
+        setUpdateKey(prev => prev + 1);
+        
+        setPremioSeleccionado(null);
+        
+        toast({
+          title: "¡Tenemos ganador!",
+          description: `${response.data.ganador.nombre} (N° ${response.data.ganador.numero}) ganó: ${premio.nombre}`
+        });
+      } catch (error) {
+        setPremioSeleccionado(null);
+        console.error('Error en sorteo de premio:', error);
+        toast({
+          title: "Error",
+          description: error.response?.data?.detail || "No se pudo realizar el sorteo",
+          variant: "destructive"
+        });
+      }
     }, 2000);
   };
 
