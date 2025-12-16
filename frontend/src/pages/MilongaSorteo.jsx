@@ -317,7 +317,7 @@ const MilongaSorteo = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {premios.map((premio) => (
                 <div
-                  key={premio.id}
+                  key={`${premio.id}-${updateKey}`}
                   className={`p-6 rounded-lg border-2 transition-all duration-300 ${
                     premio.ganado
                       ? 'bg-green-50 border-green-300'
