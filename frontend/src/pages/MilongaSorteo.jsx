@@ -12,7 +12,8 @@ import {
   sortearBailarines,
   sortearRitmo,
   sortearPremio,
-  mockPremios
+  obtenerPremios,
+  marcarPremioGanado
 } from '../mock';
 
 const MilongaSorteo = () => {
