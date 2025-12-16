@@ -118,7 +118,7 @@ async def verificar_sorteo_baile_disponible():
 async def realizar_sorteo_baile(sorteo_input: SorteoBaileCreate):
     """Realizar sorteo de baile"""
     # Verificar disponibilidad
-    if not sorteo_baile_disponible():
+    if not await sorteo_baile_disponible(db):
         raise HTTPException(
             status_code=403, 
             detail="El sorteo de baile aún no está disponible. Se habilitará el 21 de diciembre a las 22:30"
