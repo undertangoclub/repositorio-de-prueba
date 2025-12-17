@@ -385,9 +385,20 @@ const MilongaSorteo = () => {
           </CardHeader>
           <CardContent className="pt-6">
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Cantidad de bailarines:
-              </label>
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-medium text-gray-700">
+                  Cantidad de bailarines:
+                </label>
+                <Button
+                  onClick={sortearCantidad}
+                  variant="outline"
+                  size="sm"
+                  className="border-orange-400 text-orange-700 hover:bg-orange-50"
+                >
+                  <Shuffle className="w-4 h-4 mr-2" />
+                  Sortear Cantidad
+                </Button>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
                   <Button
