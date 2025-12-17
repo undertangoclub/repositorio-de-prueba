@@ -185,6 +185,17 @@ const MilongaSorteo = () => {
     }
   };
 
+  const sortearCantidad = () => {
+    const opciones = [1, 2, 3, 4, 5, 6, 7, 8, 'todos'];
+    const cantidadSorteada = opciones[Math.floor(Math.random() * opciones.length)];
+    setCantidadBailarines(cantidadSorteada);
+    
+    toast({
+      title: "Cantidad sorteada",
+      description: `Se seleccionó: ${cantidadSorteada === 'todos' ? 'Todos' : cantidadSorteada + ' bailarín(es)'}`
+    });
+  };
+
   const handleSortearBaile = async () => {
     if (bailarines.length === 0) {
       toast({
