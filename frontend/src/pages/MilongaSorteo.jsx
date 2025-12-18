@@ -400,6 +400,65 @@ const MilongaSorteo = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Gestión de Ritmos */}
+        <Card className="mb-8 border-2 border-purple-200 shadow-xl">
+          <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50">
+            <CardTitle className="flex items-center gap-2 text-2xl text-purple-900">
+              <Music className="w-7 h-7" />
+              Gestión de Ritmos
+            </CardTitle>
+            <CardDescription>Agrega o elimina ritmos disponibles para los sorteos</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="flex gap-2 mb-6">
+              <Input
+                placeholder="Nombre del ritmo (ej: Tango, Salsa...)"
+                value={ritmoInput}
+                onChange={(e) => setRitmoInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleAgregarRitmo()}
+                className="flex-1 border-purple-300 focus:border-purple-500"
+              />
+              <Button
+                onClick={handleAgregarRitmo}
+                className="bg-purple-600 hover:bg-purple-700 transition-all duration-300"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Agregar
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              {ritmos.map((ritmo) => (
+                <div
+                  key={ritmo.id}
+                  className="flex items-center justify-between p-3 bg-white border-2 border-purple-200 rounded-lg hover:shadow-md transition-all duration-300"
+                >
+                  <span className="font-medium text-gray-800">{ritmo.nombre}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleEliminarRitmo(ritmo.id)}
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+
+            {ritmos.length === 0 && (
+              <div className="text-center py-12 text-gray-400">
+                <Music className="w-16 h-16 mx-auto mb-4 opacity-30" />
+                <p>No hay ritmos disponibles aún</p>
+              </div>
+            )}
+
+            <div className="mt-4 text-sm text-gray-600 bg-purple-50 p-3 rounded-lg">
+              <strong>Total de ritmos:</strong> {ritmos.length}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Registro de Bailarines */}
         <Card className="mb-8 border-2 border-amber-200 shadow-xl">
           <CardHeader className="bg-gradient-to-r from-amber-50 to-orange-50">
