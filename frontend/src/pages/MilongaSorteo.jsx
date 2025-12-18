@@ -468,6 +468,8 @@ const MilongaSorteo = () => {
               onClick={handleSortearBaile}
               disabled={sorteoActivo || !sorteoBaileDisponible}
               className={`w-full font-bold py-6 text-lg transition-all duration-300 shadow-lg hover:shadow-xl ${
+                sorteoActivo ? 'drum-shake pulse-glow' : ''
+              } ${
                 !sorteoBaileDisponible 
                   ? 'bg-gray-400 cursor-not-allowed' 
                   : 'bg-gradient-to-r from-orange-600 to-rose-600 hover:from-orange-700 hover:to-rose-700 text-white'
