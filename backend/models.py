@@ -32,6 +32,16 @@ class SorteoBaile(BaseModel):
     fecha: datetime = Field(default_factory=datetime.utcnow)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+# Ritmo Models
+class RitmoCreate(BaseModel):
+    nombre: str
+
+class Ritmo(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nombre: str
+    activo: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
 # Premio Models
 class Ganador(BaseModel):
     id: str
