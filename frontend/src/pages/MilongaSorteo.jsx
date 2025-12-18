@@ -586,13 +586,15 @@ const MilongaSorteo = () => {
                   </div>
 
                   {premio.ganado ? (
-                    <div className="text-center space-y-2">
-                      <Badge className="bg-green-600 text-white">
-                        ¡Ganado!
+                    <div className="text-center space-y-3 zoom-reveal">
+                      <Badge className="bg-gradient-to-r from-green-600 to-emerald-600 text-white text-lg px-4 py-2 shadow-lg">
+                        ¡Ganador!
                       </Badge>
-                      <div className="p-3 bg-white rounded-lg border border-green-300">
-                        <p className="font-semibold text-green-900">{premio.ganador.nombre}</p>
-                        <p className="text-sm text-green-700">N° {premio.ganador.numero}</p>
+                      <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border-2 border-green-400 shadow-lg float">
+                        <p className="font-bold text-green-900 text-lg">{premio.ganador.nombre}</p>
+                        <Badge className="bg-green-600 text-white mt-2 font-bold">
+                          N° {premio.ganador.numero}
+                        </Badge>
                       </div>
                     </div>
                   ) : (
