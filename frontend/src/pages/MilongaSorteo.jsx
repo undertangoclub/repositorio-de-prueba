@@ -237,9 +237,6 @@ const MilongaSorteo = () => {
           cantidad: cantidadBailarines
         });
         
-        // Platillo al revelar resultado
-        playCymbalCrash();
-        
         setResultadoSorteo({
           bailarines: response.data.bailarines,
           ritmo: response.data.ritmo
@@ -248,7 +245,7 @@ const MilongaSorteo = () => {
         setSorteoActivo(false);
         
         // Sonido de victoria
-        setTimeout(() => playWinSound(), 300);
+        playWinSound();
         
         toast({
           title: "¡A bailar!",
