@@ -123,6 +123,34 @@ code {
   100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
 }
 
+@keyframes zoom-reveal {
+  0% { 
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  50% { 
+    transform: scale(1.2) rotate(10deg);
+  }
+  100% { 
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { 
+    filter: drop-shadow(0 0 10px rgba(249, 115, 22, 0.5));
+  }
+  50% { 
+    filter: drop-shadow(0 0 30px rgba(249, 115, 22, 1));
+  }
+}
+
 .drum-shake {
   animation: drum-shake 0.5s ease-in-out infinite;
 }
@@ -137,6 +165,18 @@ code {
 
 .bounce-in {
   animation: bounce-in 0.5s ease-out;
+}
+
+.zoom-reveal {
+  animation: zoom-reveal 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
 }
 
 @layer base {
