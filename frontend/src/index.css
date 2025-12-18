@@ -82,6 +82,63 @@ code {
     }
 }
 
+/* Animaciones para sorteos */
+@keyframes drum-shake {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  10% { transform: translateX(-3px) rotate(-1deg); }
+  20% { transform: translateX(3px) rotate(1deg); }
+  30% { transform: translateX(-3px) rotate(-1deg); }
+  40% { transform: translateX(3px) rotate(1deg); }
+  50% { transform: translateX(-2px) rotate(-0.5deg); }
+  60% { transform: translateX(2px) rotate(0.5deg); }
+  70% { transform: translateX(-2px) rotate(-0.5deg); }
+  80% { transform: translateX(2px) rotate(0.5deg); }
+  90% { transform: translateX(-1px) rotate(-0.25deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.4);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 0 40px rgba(249, 115, 22, 0.8);
+    transform: scale(1.05);
+  }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes bounce-in {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes confetti {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+.drum-shake {
+  animation: drum-shake 0.5s ease-in-out infinite;
+}
+
+.pulse-glow {
+  animation: pulse-glow 1s ease-in-out infinite;
+}
+
+.spin-slow {
+  animation: spin-slow 2s linear infinite;
+}
+
+.bounce-in {
+  animation: bounce-in 0.5s ease-out;
+}
+
 @layer base {
     [data-debug-wrapper="true"] {
         display: contents !important;
