@@ -487,31 +487,60 @@ const MilongaSorteo = () => {
             </Button>
 
             {resultadoSorteo && (
-              <div className="mt-6 p-6 bg-gradient-to-br from-orange-100 to-rose-100 rounded-lg border-2 border-orange-300 bounce-in">
-                <div className="text-center mb-4">
-                  <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md">
-                    <Music className="w-5 h-5 text-orange-600" />
-                    <span className="text-2xl font-bold text-orange-900">
-                      {resultadoSorteo.ritmo}
-                    </span>
-                  </div>
+              <div className="mt-6 relative">
+                {/* Confetti background effect */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                  {[...Array(20)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="absolute w-2 h-2 rounded-full"
+                      style={{
+                        left: `${Math.random() * 100}%`,
+                        top: '-10px',
+                        backgroundColor: ['#f97316', '#ec4899', '#eab308', '#8b5cf6'][Math.floor(Math.random() * 4)],
+                        animation: `confetti ${2 + Math.random() * 2}s ease-out forwards`,
+                        animationDelay: `${Math.random() * 0.5}s`
+                      }}
+                    />
+                  ))}
                 </div>
-                <div className="space-y-2">
-                  <p className="text-sm font-semibold text-gray-700 text-center mb-3">
-                    Bailarines seleccionados:
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {resultadoSorteo.bailarines.map((bailarin) => (
-                      <div
-                        key={bailarin.id}
-                        className="flex items-center gap-2 p-3 bg-white rounded-lg shadow-sm"
-                      >
-                        <Badge className="bg-orange-600 text-white font-bold">
-                          #{bailarin.numero}
-                        </Badge>
-                        <span className="font-medium text-gray-800">{bailarin.nombre}</span>
+
+                {/* Main result card */}
+                <div className="p-8 bg-gradient-to-br from-orange-100 via-rose-100 to-pink-100 rounded-2xl border-4 border-orange-400 shadow-2xl zoom-reveal overflow-hidden relative">
+                  {/* Glow effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-orange-400/20 to-rose-400/20 blur-xl"></div>
+                  
+                  <div className="relative z-10">
+                    <div className="text-center mb-6">
+                      <div className="inline-flex items-center gap-3 bg-gradient-to-r from-orange-600 to-rose-600 px-8 py-4 rounded-full shadow-xl float glow-pulse">
+                        <Music className="w-8 h-8 text-white" />
+                        <span className="text-4xl font-black text-white tracking-wide">
+                          {resultadoSorteo.ritmo}
+                        </span>
                       </div>
-                    ))}
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <p className="text-lg font-bold text-gray-800 text-center mb-4">
+                        ¡Bailarines seleccionados!
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {resultadoSorteo.bailarines.map((bailarin, idx) => (
+                          <div
+                            key={bailarin.id}
+                            className="flex items-center gap-3 p-4 bg-white rounded-xl shadow-lg border-2 border-orange-200 hover:scale-105 transition-transform"
+                            style={{
+                              animation: `bounce-in 0.5s ease-out ${idx * 0.1}s backwards`
+                            }}
+                          >
+                            <Badge className="bg-gradient-to-r from-orange-600 to-rose-600 text-white font-bold text-lg px-4 py-2">
+                              #{bailarin.numero}
+                            </Badge>
+                            <span className="font-bold text-gray-800 text-lg">{bailarin.nombre}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
