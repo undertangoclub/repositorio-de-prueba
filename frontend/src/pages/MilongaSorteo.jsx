@@ -578,6 +578,8 @@ const MilongaSorteo = () => {
                       onClick={() => handleSortearPremio(premio)}
                       disabled={premioSeleccionado === premio.id || !sorteoPremiosDisponible}
                       className={`w-full transition-all duration-300 ${
+                        premioSeleccionado === premio.id ? 'drum-shake pulse-glow' : ''
+                      } ${
                         !sorteoPremiosDisponible
                           ? 'bg-gray-400 cursor-not-allowed'
                           : 'bg-rose-600 hover:bg-rose-700'
@@ -585,7 +587,7 @@ const MilongaSorteo = () => {
                     >
                       {premioSeleccionado === premio.id ? (
                         <>
-                          <Sparkles className="w-4 h-4 mr-2 animate-spin" />
+                          <Sparkles className="w-4 h-4 mr-2 spin-slow" />
                           Sorteando...
                         </>
                       ) : !sorteoPremiosDisponible ? (
