@@ -292,6 +292,13 @@ async def obtener_estado_premios():
     
     return resultado
 
+@api_router.post("/sorteo-premios/resetear")
+async def resetear_premios():
+    """Resetear todos los premios sorteados"""
+    result = await sorteos_premios_collection.delete_many({})
+    logger.info(f"Premios reseteados: {result.deleted_count} registros eliminados")
+    return {"mensaje": "Premios reseteados exitosamente", "count": result.deleted_count}
+
 @api_router.post("/sorteo-premios/{premio_id}", response_model=SorteoPremio)
 async def realizar_sorteo_premio(premio_id: int):
     """Realizar sorteo de un premio específico"""
