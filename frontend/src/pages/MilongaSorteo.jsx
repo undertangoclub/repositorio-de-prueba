@@ -203,6 +203,56 @@ const MilongaSorteo = () => {
     }
   };
 
+  const handleAgregarRitmo = async () => {
+    if (!ritmoInput.trim()) {
+      toast({
+        title: "Error",
+        description: "Por favor ingresa un nombre de ritmo",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${API}/ritmos`, {
+        nombre: ritmoInput.trim()
+      });
+      
+      await cargarRitmos();
+      setRitmoInput('');
+      
+      toast({
+        title: "¡Ritmo agregado!",
+        description: `${response.data.nombre}`
+      });
+    } catch (error) {
+      console.error('Error agregando ritmo:', error);
+      toast({
+        title: "Error",
+        description: error.response?.data?.detail || "No se pudo agregar el ritmo",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleEliminarRitmo = async (id) => {
+    try {
+      await axios.delete(`${API}/ritmos/${id}`);
+      await cargarRitmos();
+      toast({
+        title: "Ritmo eliminado",
+        description: "Se ha eliminado el ritmo de la lista"
+      });
+    } catch (error) {
+      console.error('Error eliminando ritmo:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar el ritmo",
+        variant: "destructive"
+      });
+    }
+  };
+
   const sortearCantidad = () => {
     // Reproducir sonido de tambor
     playDrumRoll();
