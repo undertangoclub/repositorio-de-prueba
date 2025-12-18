@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Badge } from '../components/ui/badge';
 import { toast } from '../hooks/use-toast';
 import axios from 'axios';
+import { playDrumRoll, playCymbalCrash, playWinSound } from '../utils/soundEffects';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
