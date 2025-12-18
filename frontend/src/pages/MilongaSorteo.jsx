@@ -95,23 +95,33 @@ const MilongaSorteo = () => {
   const toggleOverrideSecreto = async () => {
     try {
       if (overrideActivo) {
-        // Desactivar override
+        // Desactivar override y resetear premios
         await axios.delete(`${API}/config/override-unlock`);
+        
+        // Resetear todos los premios sorteados
+        await resetearPremios();
+        
         await verificarDisponibilidad();
+        await cargarPremios();
         
         toast({
           title: "🔒 Sorteos Bloqueados",
-          description: "Volviendo al horario programado.",
+          description: "Volviendo al horario programado. Premios reseteados.",
           duration: 5000
         });
       } else {
-        // Activar override
+        // Activar override y resetear premios
         await axios.post(`${API}/config/override-unlock`);
+        
+        // Resetear todos los premios sorteados
+        await resetearPremios();
+        
         await verificarDisponibilidad();
+        await cargarPremios();
         
         toast({
           title: "🔓 Sorteos Desbloqueados",
-          description: "Modo administrador activado. Todos los sorteos están disponibles.",
+          description: "Modo administrador activado. Premios reseteados.",
           duration: 5000
         });
       }
@@ -122,6 +132,15 @@ const MilongaSorteo = () => {
         description: "No se pudo cambiar el estado del desbloqueo",
         variant: "destructive"
       });
+    }
+  };
+
+  const resetearPremios = async () => {
+    try {
+      // Llamar al endpoint para resetear premios
+      await axios.post(`${API}/sorteo-premios/resetear`);
+    } catch (error) {
+      console.error('Error reseteando premios:', error);
     }
   };
 
