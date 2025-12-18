@@ -8,7 +8,8 @@ from pathlib import Path
 from typing import List
 
 from models import (
-    BailarinCreate, Bailarin, 
+    BailarinCreate, Bailarin,
+    RitmoCreate, Ritmo,
     SorteoBaileCreate, SorteoBaile, BailarinSorteado,
     Premio, SorteoPremio, Ganador,
     DisponibilidadResponse
