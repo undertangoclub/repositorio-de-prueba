@@ -48,6 +48,78 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# ==================== RITMOS ENDPOINTS ====================
+
+@api_router.post("/ritmos", response_model=Ritmo)
+async def crear_ritmo(ritmo_input: RitmoCreate):
+    """Registrar un nuevo ritmo"""
+    if not ritmo_input.nombre.strip():
+        raise HTTPException(status_code=400, detail="El nombre del ritmo no puede estar vacío")
+    
+    # Verificar si ya existe
+    existente = await ritmos_collection.find_one({
+        "nombre": {"$regex": f"^{ritmo_input.nombre.strip()}$", "$options": "i"},
+        "activo": True
+    })
+    
+    if existente:
+        raise HTTPException(status_code=400, detail="Este ritmo ya existe")
+    
+    # Crear ritmo
+    ritmo = Ritmo(nombre=ritmo_input.nombre.strip())
+    
+    # Guardar en DB
+    await ritmos_collection.insert_one(ritmo.dict())
+    
+    logger.info(f"Ritmo registrado: {ritmo.nombre}")
+    return ritmo
+
+@api_router.get("/ritmos", response_model=List[Ritmo])
+async def obtener_ritmos():
+    """Obtener todos los ritmos activos"""
+    ritmos = await ritmos_collection.find(
+        {"activo": True}
+    ).sort("nombre", 1).to_list(1000)
+    
+    return [Ritmo(**r) for r in ritmos]
+
+@api_router.delete("/ritmos/{ritmo_id}")
+async def eliminar_ritmo(ritmo_id: str):
+    """Eliminar un ritmo (marcar como inactivo)"""
+    result = await ritmos_collection.update_one(
+        {"id": ritmo_id},
+        {"$set": {"activo": False}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Ritmo no encontrado")
+    
+    logger.info(f"Ritmo eliminado: {ritmo_id}")
+    return {"mensaje": "Ritmo eliminado exitosamente"}
+
+@api_router.post("/ritmos/inicializar")
+async def inicializar_ritmos():
+    """Inicializar ritmos por defecto si no hay ninguno"""
+    count = await ritmos_collection.count_documents({"activo": True})
+    
+    if count == 0:
+        ritmos_default = [
+            'Tango', 'Vals', 'Milonga', 'Forró', 'Rock and Roll',
+            'Axé', 'Lambada', 'Sertanejo', 'Funky', 'Salsa',
+            'Cumbia', 'Bachata', 'Merengue', 'Chacarera', 'Zamba',
+            'Cuarteto', 'Reggaeton', 'Swing', 'Blues', 'Samba',
+            'Bolero', 'Chamamé', 'Paso Doble', 'Mambo', 'Cha Cha Cha'
+        ]
+        
+        for nombre in ritmos_default:
+            ritmo = Ritmo(nombre=nombre)
+            await ritmos_collection.insert_one(ritmo.dict())
+        
+        logger.info(f"Inicializados {len(ritmos_default)} ritmos por defecto")
+        return {"mensaje": f"Se inicializaron {len(ritmos_default)} ritmos", "count": len(ritmos_default)}
+    
+    return {"mensaje": "Los ritmos ya están inicializados", "count": count}
+
 # ==================== BAILARINES ENDPOINTS ====================
 
 @api_router.post("/bailarines", response_model=Bailarin)
