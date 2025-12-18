@@ -207,9 +207,17 @@ async def realizar_sorteo_baile(sorteo_input: SorteoBaileCreate):
     if not bailarines:
         raise HTTPException(status_code=400, detail="No hay bailarines registrados")
     
+    # Obtener ritmos activos
+    ritmos = await ritmos_collection.find(
+        {"activo": True}
+    ).to_list(1000)
+    
+    if not ritmos:
+        raise HTTPException(status_code=400, detail="No hay ritmos disponibles")
+    
     # Sortear bailarines y ritmo
     bailarines_sorteados = sortear_bailarines(bailarines, sorteo_input.cantidad)
-    ritmo_sorteado = sortear_ritmo()
+    ritmo_sorteado = sortear_ganador(ritmos)['nombre']
     
     # Crear objeto de sorteo
     sorteo = SorteoBaile(
