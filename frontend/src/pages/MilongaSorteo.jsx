@@ -196,9 +196,6 @@ const MilongaSorteo = () => {
       const cantidadSorteada = opciones[Math.floor(Math.random() * opciones.length)];
       setCantidadBailarines(cantidadSorteada);
       
-      // Sonido de platillo al final
-      playCymbalCrash();
-      
       toast({
         title: "Cantidad sorteada",
         description: `Se seleccionó: ${cantidadSorteada === 'todos' ? 'Todos' : cantidadSorteada + ' bailarín(es)'}`
