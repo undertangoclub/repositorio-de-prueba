@@ -301,14 +301,13 @@ const MilongaSorteo = () => {
       try {
         const response = await axios.post(`${API}/sorteo-premios/${premio.id}`);
         
-        // Platillo y victoria
-        playCymbalCrash();
-        setTimeout(() => playWinSound(), 400);
-        
         await cargarPremios();
         setUpdateKey(prev => prev + 1);
         
         setPremioSeleccionado(null);
+        
+        // Sonido de victoria
+        playWinSound();
         
         toast({
           title: "¡Tenemos ganador!",
