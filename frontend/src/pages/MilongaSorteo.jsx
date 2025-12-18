@@ -40,8 +40,23 @@ const MilongaSorteo = () => {
 
   const cargarDatos = async () => {
     await cargarBailarines();
+    await cargarRitmos();
     await cargarPremios();
     await verificarDisponibilidad();
+  };
+
+  const cargarRitmos = async () => {
+    try {
+      const response = await axios.get(`${API}/ritmos`);
+      setRitmos(response.data);
+    } catch (error) {
+      console.error('Error cargando ritmos:', error);
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar los ritmos",
+        variant: "destructive"
+      });
+    }
   };
 
   const verificarDisponibilidad = async () => {
