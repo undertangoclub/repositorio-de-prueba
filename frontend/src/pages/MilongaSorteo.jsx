@@ -227,12 +227,18 @@ const MilongaSorteo = () => {
 
     setSorteoActivo(true);
     
-    // Animación de sorteo
+    // Reproducir sonido de tambores
+    playDrumRoll();
+    
+    // Animación de sorteo con suspenso
     setTimeout(async () => {
       try {
         const response = await axios.post(`${API}/sorteo-baile`, {
           cantidad: cantidadBailarines
         });
+        
+        // Platillo al revelar resultado
+        playCymbalCrash();
         
         setResultadoSorteo({
           bailarines: response.data.bailarines,
@@ -240,6 +246,9 @@ const MilongaSorteo = () => {
         });
         
         setSorteoActivo(false);
+        
+        // Sonido de victoria
+        setTimeout(() => playWinSound(), 300);
         
         toast({
           title: "¡A bailar!",
