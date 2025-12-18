@@ -30,6 +30,7 @@ db = client[os.environ['DB_NAME']]
 
 # Collections
 bailarines_collection = db.bailarines
+ritmos_collection = db.ritmos
 sorteos_baile_collection = db.sorteos_baile
 sorteos_premios_collection = db.sorteos_premios
 
