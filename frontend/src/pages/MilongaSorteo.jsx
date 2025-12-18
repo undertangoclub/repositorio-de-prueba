@@ -26,6 +26,8 @@ const MilongaSorteo = () => {
   const [mensajePremios, setMensajePremios] = useState('');
   const [clickCount, setClickCount] = useState(0);
   const [overrideActivo, setOverrideActivo] = useState(false);
+  const [ritmos, setRitmos] = useState([]);
+  const [ritmoInput, setRitmoInput] = useState('');
 
   useEffect(() => {
     cargarDatos();
