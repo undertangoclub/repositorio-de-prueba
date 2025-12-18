@@ -187,14 +187,23 @@ const MilongaSorteo = () => {
   };
 
   const sortearCantidad = () => {
-    const opciones = [1, 2, 3, 4, 5, 6, 7, 8, 'todos'];
-    const cantidadSorteada = opciones[Math.floor(Math.random() * opciones.length)];
-    setCantidadBailarines(cantidadSorteada);
+    // Reproducir sonido de tambor
+    playDrumRoll();
     
-    toast({
-      title: "Cantidad sorteada",
-      description: `Se seleccionó: ${cantidadSorteada === 'todos' ? 'Todos' : cantidadSorteada + ' bailarín(es)'}`
-    });
+    // Esperar un poco para el suspenso
+    setTimeout(() => {
+      const opciones = [1, 2, 3, 4, 5, 6, 7, 8, 'todos'];
+      const cantidadSorteada = opciones[Math.floor(Math.random() * opciones.length)];
+      setCantidadBailarines(cantidadSorteada);
+      
+      // Sonido de platillo al final
+      playCymbalCrash();
+      
+      toast({
+        title: "Cantidad sorteada",
+        description: `Se seleccionó: ${cantidadSorteada === 'todos' ? 'Todos' : cantidadSorteada + ' bailarín(es)'}`
+      });
+    }, 1700);
   };
 
   const handleSortearBaile = async () => {
