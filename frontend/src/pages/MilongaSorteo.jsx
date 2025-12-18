@@ -296,10 +296,17 @@ const MilongaSorteo = () => {
 
     setPremioSeleccionado(premio.id);
     
-    // Animación de sorteo
+    // Reproducir sonido de tambores
+    playDrumRoll();
+    
+    // Animación de sorteo con suspenso
     setTimeout(async () => {
       try {
         const response = await axios.post(`${API}/sorteo-premios/${premio.id}`);
+        
+        // Platillo y victoria
+        playCymbalCrash();
+        setTimeout(() => playWinSound(), 400);
         
         await cargarPremios();
         setUpdateKey(prev => prev + 1);
