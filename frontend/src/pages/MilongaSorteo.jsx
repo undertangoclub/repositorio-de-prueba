@@ -494,7 +494,7 @@ const MilongaSorteo = () => {
             </Button>
 
             {resultadoSorteo && (
-              <div className="mt-6 p-6 bg-gradient-to-br from-orange-100 to-rose-100 rounded-lg border-2 border-orange-300 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="mt-6 p-6 bg-gradient-to-br from-orange-100 to-rose-100 rounded-lg border-2 border-orange-300 bounce-in">
                 <div className="text-center mb-4">
                   <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md">
                     <Music className="w-5 h-5 text-orange-600" />
